@@ -6,7 +6,7 @@ Uart based dust sensor parsing and visualization program
 - env : C#, VS2015
 - font : [D2_Coding](http://dev.naver.com/projects/d2coding/download/11568?filename=D2Coding-Ver1.1-TTC-20151103.zip)
 
-![image](https://cloud.githubusercontent.com/assets/2930125/18542397/a38bf40e-7b65-11e6-9728-b78ce866c52f.png)
+![image](https://cloud.githubusercontent.com/assets/2930125/18542591/ab08d69c-7b66-11e6-8cfd-cf47d312c001.png)
 
 ## supported sensor
 - inovafitness
