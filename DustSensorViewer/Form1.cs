@@ -14,7 +14,7 @@ namespace DustSensorViewer
 {
     public partial class Form1 : Form
     {
-        const int CHART_AXIS_X_MAX = 300;
+        private static readonly int CHART_AXIS_X_MAX = 300;
         public Form1()
         {
             InitializeComponent();
