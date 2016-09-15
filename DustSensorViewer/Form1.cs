@@ -109,8 +109,8 @@ namespace DustSensorViewer
                                                       "{0}\t{1}\t{2}\t{3}",
                                                       "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" };
 
-        private static readonly string[] TEXT_LINE = { "{0}\tPM10\t{1}\tPM2.5\t{2}\tSensor: {3}",
-                                                       "{0}\tPM10\t{1}\tPM2.5\t{2}\tPM1.0\t{3}\tSensor: {4}"};
+        private static readonly string[] TEXT_LINE = { "{0}\tPM 10\t{1} µg/m3\tPM 2.5\t{2} µg/m3\tSensor: {3}",
+                                                       "{0}\tPM 10\t{1} µg/m3\tPM 2.5\t{2} µg/m3\tPM 1.0\t{3} µg/m3\tSensor: {4}"};
 
 
         private void update(string sensor_name, double pm10, double pm25)
@@ -146,6 +146,8 @@ namespace DustSensorViewer
 
                     foreach (var log in last_logs)
                     {
+                        if (!IsControlValid(this)) return;
+
                         if (!LOG_FIRST_LINE.Any(log.Contains))
                         {
                             string[] parsed = log.Split('\t');
@@ -189,16 +191,34 @@ namespace DustSensorViewer
             }
         }
 
+        private bool AbortThread = false;
+        private bool IsControlValid(Control myControl)
+        {
+            if (myControl == null)          return false;
+            if (myControl.IsDisposed)       return false;
+            if (myControl.Disposing)        return false;
+            if (!myControl.IsHandleCreated) return false;
+            if (AbortThread)                return false; // the signal to the thread to stop processing
+
+            return true;
+        }
+
         private void update_text(string s)
         {
+            if (!IsControlValid(textBox_console)) return;
+
             Thread thread_log = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                if (!this.Disposing)
+                if (textBox_console.InvokeRequired)
                 {
-                    this.Invoke(new Action(delegate ()
+                    textBox_console.Invoke(new Action(delegate ()
                     {
                         textBox_console.AppendText(s + "\r\n");
                     }));
+                }
+                else
+                {
+                    textBox_console.Refresh();
                 }
             }));
             thread_log.Start(); // thread 실행하여 병렬작업 시작
@@ -206,11 +226,13 @@ namespace DustSensorViewer
 
         private void update_chart<T>(T pm10, T pm25)
         {
+            if (!IsControlValid(chart1)) return;
+
             Thread thread_chart = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                if(!this.Disposing)
+                if (chart1.InvokeRequired)
                 {
-                    this.Invoke(new Action(delegate ()
+                    chart1.Invoke(new Action(delegate ()
                     {
                         if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
@@ -223,20 +245,25 @@ namespace DustSensorViewer
                         chart1.Series["PM10"].Points.AddY(pm10);
                         chart1.Series["PM2.5"].Points.AddY(pm25);
                         chart1.Series["PM1.0"].Points.AddY(0);
-
                     }));
-                }                
+                }
+                else
+                {
+                    chart1.Refresh();
+                }
             }));
             thread_chart.Start(); // thread 실행하여 병렬작업 시작
         }
 
         private void update_chart<T>(T pm10, T pm25, T pm1)
         {
+            if (!IsControlValid(chart1)) return;
+
             Thread thread_chart = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                if (!this.Disposing)
+                if (chart1.InvokeRequired)
                 {
-                    this.Invoke(new Action(delegate ()
+                    chart1.Invoke(new Action(delegate ()
                     {
                         if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
@@ -247,8 +274,12 @@ namespace DustSensorViewer
                         }
                         chart1.Series["PM10"].Points.AddY(pm10);
                         chart1.Series["PM2.5"].Points.AddY(pm25);
-                        chart1.Series["PM1.0"].Points.AddY(pm1);
+                        chart1.Series["PM1.0"].Points.AddY(pm1);                       
                     }));
+                }
+                else
+                {
+                    chart1.Refresh();
                 }
             }));
             thread_chart.Start(); // thread 실행하여 병렬작업 시작
@@ -335,9 +366,10 @@ namespace DustSensorViewer
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(serialPort1.IsOpen)
-                    serialPort1.Close();
-            
+            AbortThread = true;
+
+            if (serialPort1.IsOpen)
+                    serialPort1.Close();            
         }
     }
 }

@@ -71,7 +71,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(937, 906);
+            this.splitContainer1.Size = new System.Drawing.Size(1344, 906);
             this.splitContainer1.SplitterDistance = 38;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 0;
@@ -118,7 +118,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.chart1);
-            this.splitContainer2.Size = new System.Drawing.Size(937, 863);
+            this.splitContainer2.Size = new System.Drawing.Size(1344, 863);
             this.splitContainer2.SplitterDistance = 197;
             this.splitContainer2.TabIndex = 0;
             // 
@@ -135,7 +135,7 @@
             this.textBox_console.Name = "textBox_console";
             this.textBox_console.ReadOnly = true;
             this.textBox_console.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_console.Size = new System.Drawing.Size(937, 197);
+            this.textBox_console.Size = new System.Drawing.Size(1344, 197);
             this.textBox_console.TabIndex = 0;
             this.textBox_console.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -185,7 +185,7 @@
             this.chart1.Series.Add(series1);
             this.chart1.Series.Add(series2);
             this.chart1.Series.Add(series3);
-            this.chart1.Size = new System.Drawing.Size(937, 662);
+            this.chart1.Size = new System.Drawing.Size(1344, 662);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
             // 
@@ -199,7 +199,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(937, 906);
+            this.ClientSize = new System.Drawing.Size(1344, 906);
             this.Controls.Add(this.splitContainer1);
             this.Font = new System.Drawing.Font("D2Coding", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
