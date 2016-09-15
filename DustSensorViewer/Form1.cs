@@ -84,7 +84,12 @@ namespace DustSensorViewer
                 }                
 
                 if(serialPort1.IsOpen)
+                {
                     button_con.Text = "Disconnect";
+                    button_con.ForeColor = Color.Black;
+                    button_con.BackColor = Color.Lime;
+
+                }
             }
             else
             {
@@ -92,7 +97,11 @@ namespace DustSensorViewer
                     serialPort1.Close();
 
                 if (!serialPort1.IsOpen)
+                {
                     button_con.Text = "Connect";
+                    button_con.ForeColor = Color.Lime;
+                    button_con.BackColor = Color.Black;
+                }
             }
         }
 
