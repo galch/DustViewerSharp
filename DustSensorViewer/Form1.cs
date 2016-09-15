@@ -20,7 +20,7 @@ namespace DustSensorViewer
             InitializeComponent();
 
             update_comboBox();
-
+            
             chart1.ChartAreas[0].AxisX.Minimum = 1;
             chart1.ChartAreas[0].AxisX.Maximum = CHART_AXIS_X_MAX + 1;
             chart1.ChartAreas[0].AxisY.Minimum = 0;
@@ -69,29 +69,30 @@ namespace DustSensorViewer
     
         private void button_con_Click(object sender, EventArgs e)
         {
-            if(button_con.Text == "Connect")
+            if (!serialPort1.IsOpen)
+                serialPort1.PortName = comboBox_port.SelectedItem.ToString();
+
+            if (button_con.Text == "Connect")
             {
-                if (!serialPort1.IsOpen)
+                try
                 {
-                    serialPort1.PortName = comboBox_port.SelectedItem.ToString();
                     serialPort1.Open();
                 }
-                else
+                catch
                 {
-                    serialPort1.Close();
-                    serialPort1.PortName = comboBox_port.SelectedItem.ToString();
-                    serialPort1.Open();
-                }
+                    MessageBox.Show("Serial Port Access Denied");
+                }                
 
                 if(serialPort1.IsOpen)
                     button_con.Text = "Disconnect";
-            } else
+            }
+            else
             {
                 if (serialPort1.IsOpen)
-                {
                     serialPort1.Close();
+
+                if (!serialPort1.IsOpen)
                     button_con.Text = "Connect";
-                }
             }
         }
 
@@ -192,10 +193,13 @@ namespace DustSensorViewer
         {
             Thread thread_log = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                this.Invoke(new Action(delegate ()
+                if (!this.Disposing)
                 {
-                    textBox_console.AppendText(s + "\r\n");
-                }));
+                    this.Invoke(new Action(delegate ()
+                    {
+                        textBox_console.AppendText(s + "\r\n");
+                    }));
+                }
             }));
             thread_log.Start(); // thread 실행하여 병렬작업 시작
         }
@@ -204,21 +208,24 @@ namespace DustSensorViewer
         {
             Thread thread_chart = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                this.Invoke(new Action(delegate ()
+                if(!this.Disposing)
                 {
-                    if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                    this.Invoke(new Action(delegate ()
                     {
-                        chart1.Series["PM10"].Points.RemoveAt(0);
-                        chart1.Series["PM2.5"].Points.RemoveAt(0);
-                        chart1.Series["PM1.0"].Points.RemoveAt(0);
+                        if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                        {
+                            chart1.Series["PM10"].Points.RemoveAt(0);
+                            chart1.Series["PM2.5"].Points.RemoveAt(0);
+                            chart1.Series["PM1.0"].Points.RemoveAt(0);
 
-                        chart1.ChartAreas[0].RecalculateAxesScale();
-                    }
-                    chart1.Series["PM10"].Points.AddY(pm10);
-                    chart1.Series["PM2.5"].Points.AddY(pm25);
-                    chart1.Series["PM1.0"].Points.AddY(0);
+                            chart1.ChartAreas[0].RecalculateAxesScale();
+                        }
+                        chart1.Series["PM10"].Points.AddY(pm10);
+                        chart1.Series["PM2.5"].Points.AddY(pm25);
+                        chart1.Series["PM1.0"].Points.AddY(0);
 
-                }));
+                    }));
+                }                
             }));
             thread_chart.Start(); // thread 실행하여 병렬작업 시작
         }
@@ -227,20 +234,22 @@ namespace DustSensorViewer
         {
             Thread thread_chart = new Thread(new ThreadStart(delegate () // thread 생성
             {
-                this.Invoke(new Action(delegate ()
+                if (!this.Disposing)
                 {
-                    if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                    this.Invoke(new Action(delegate ()
                     {
-                        chart1.Series["PM10"].Points.RemoveAt(0);
-                        chart1.Series["PM2.5"].Points.RemoveAt(0);
-                        chart1.Series["PM1.0"].Points.RemoveAt(0);
-                        chart1.ChartAreas[0].RecalculateAxesScale();
-                    }
-                    chart1.Series["PM10"].Points.AddY(pm10);
-                    chart1.Series["PM2.5"].Points.AddY(pm25);
-                    chart1.Series["PM1.0"].Points.AddY(pm1);
-
-                }));
+                        if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                        {
+                            chart1.Series["PM10"].Points.RemoveAt(0);
+                            chart1.Series["PM2.5"].Points.RemoveAt(0);
+                            chart1.Series["PM1.0"].Points.RemoveAt(0);
+                            chart1.ChartAreas[0].RecalculateAxesScale();
+                        }
+                        chart1.Series["PM10"].Points.AddY(pm10);
+                        chart1.Series["PM2.5"].Points.AddY(pm25);
+                        chart1.Series["PM1.0"].Points.AddY(pm1);
+                    }));
+                }
             }));
             thread_chart.Start(); // thread 실행하여 병렬작업 시작
         }
@@ -323,5 +332,12 @@ namespace DustSensorViewer
             }
         }
         #endregion
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(serialPort1.IsOpen)
+                    serialPort1.Close();
+            
+        }
     }
 }
