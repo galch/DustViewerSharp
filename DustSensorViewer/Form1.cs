@@ -272,7 +272,7 @@ namespace DustSensorViewer
         const byte PMS_HEADER = 0x42;
         private void parse_PMS(byte[] raw_input)
         {
-            // https://drive.google.com/file/d/0B6jowxS0fbXsQi1MSHR5UzFPa3c/view
+            // datasheet : https://drive.google.com/file/d/0B6jowxS0fbXsQi1MSHR5UzFPa3c/view
             // packet format: 42 4D CF_1.0_High CF_1.0_Low ...
             if (raw_input.Count() != 32) return;
             if (raw_input[0] != PMS_HEADER || raw_input[1] != 0x4D) return;
@@ -310,7 +310,7 @@ namespace DustSensorViewer
 
             Console.WriteLine("{0}, {1},version = {2}, bug = {3}", raw_input[2], raw_input[3], raw_input[28], raw_input[29]);
             
-            if (raw_input[28] == 114)    // PMS-5003 or 1003?
+            if (raw_input[28] == 114)    // PMS-5003 or 1003
                 update("PMS5003", Air_data[2], Air_data[1], Air_data[0]);
             if (raw_input[28] == 128)    // PMS-7003
             {
@@ -318,7 +318,6 @@ namespace DustSensorViewer
 
                 //string s_log = String.Format(LOG_LINE[1], DateTime.Now.ToString(TIME_FORMAT[0]), CF_data[2], CF_data[1], CF_data[0]);
                 //update_log("PMS7003_CF", s_log);
-
                 //s_log = String.Format(LOG_LINE[2], DateTime.Now.ToString(TIME_FORMAT[0]), raw_particle[0], raw_particle[1], raw_particle[2], raw_particle[3], raw_particle[4], raw_particle[5]);
                 //update_log("PMS7003_Raw", s_log);
             }
