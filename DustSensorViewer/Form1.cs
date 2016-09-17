@@ -94,6 +94,12 @@ namespace DustSensorViewer
     
         private void button_con_Click(object sender, EventArgs e)
         {
+            if (comboBox_port.SelectedItem == null)
+            {
+                MessageBox.Show("Serial Device was not found!");
+                return;
+            }
+
             if (!serialPort1.IsOpen)
                 serialPort1.PortName = comboBox_port.SelectedItem.ToString();
 
