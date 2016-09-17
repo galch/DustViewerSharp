@@ -45,6 +45,8 @@
             this.textBox_console = new System.Windows.Forms.TextBox();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.numericUpDown_chartX = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -55,6 +57,7 @@
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_chartX)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -69,6 +72,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.numericUpDown_chartX);
+            this.splitContainer1.Panel1.Controls.Add(this.label1);
             this.splitContainer1.Panel1.Controls.Add(this.checkBox_filter);
             this.splitContainer1.Panel1.Controls.Add(this.numericUpDown1);
             this.splitContainer1.Panel1.Controls.Add(this.checkBox_PMS_raw);
@@ -247,6 +252,47 @@
             this.serialPort1.PortName = "COM15";
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
+            // numericUpDown_chartX
+            // 
+            this.numericUpDown_chartX.BackColor = System.Drawing.Color.Black;
+            this.numericUpDown_chartX.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.numericUpDown_chartX.ForeColor = System.Drawing.Color.Lime;
+            this.numericUpDown_chartX.Increment = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.numericUpDown_chartX.Location = new System.Drawing.Point(1212, 19);
+            this.numericUpDown_chartX.Maximum = new decimal(new int[] {
+            7200,
+            0,
+            0,
+            0});
+            this.numericUpDown_chartX.Minimum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.numericUpDown_chartX.Name = "numericUpDown_chartX";
+            this.numericUpDown_chartX.Size = new System.Drawing.Size(120, 29);
+            this.numericUpDown_chartX.TabIndex = 5;
+            this.numericUpDown_chartX.Value = new decimal(new int[] {
+            600,
+            0,
+            0,
+            0});
+            this.numericUpDown_chartX.ValueChanged += new System.EventHandler(this.numericUpDown_chartX_ValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.Lime;
+            this.label1.Location = new System.Drawing.Point(1139, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 26);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Plot";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
@@ -273,6 +319,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_chartX)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -289,6 +336,8 @@
         private System.Windows.Forms.CheckBox checkBox_PMS_raw;
         private System.Windows.Forms.CheckBox checkBox_filter;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numericUpDown_chartX;
+        private System.Windows.Forms.Label label1;
     }
 }
 

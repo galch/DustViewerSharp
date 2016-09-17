@@ -14,7 +14,7 @@ namespace DustSensorViewer
 {
     public partial class Form1 : Form
     {
-        private static readonly int CHART_AXIS_X_MAX = 3600;    // sec
+        private static readonly int CHART_AXIS_X_MAX = 600;    // sec
         public Form1()
         {
             InitializeComponent();
@@ -305,7 +305,7 @@ namespace DustSensorViewer
                                 chart1.Series.Remove(chart1.Series.FindByName(Avg_25));                            
                         }
 
-                        if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                        while (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
                             chart1.Series["PM10"].Points.RemoveAt(0);
                             chart1.Series["PM2.5"].Points.RemoveAt(0);
@@ -378,7 +378,7 @@ namespace DustSensorViewer
                                 chart1.Series.Remove(chart1.Series.FindByName(Avg_25));
                         }
 
-                        if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                        while (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
                             chart1.Series["PM10"].Points.RemoveAt(0);
                             chart1.Series["PM2.5"].Points.RemoveAt(0);
@@ -526,6 +526,15 @@ namespace DustSensorViewer
                     }
                 }));
             }
+        }
+
+        private void numericUpDown_chartX_ValueChanged(object sender, EventArgs e)
+        {
+            chart1.Invoke(new Action(delegate ()
+            {
+                chart1.ChartAreas[0].AxisX.Maximum = (int)numericUpDown_chartX.Value + 1;
+                chart1.Update();
+            }));
         }
     }
 }
