@@ -14,7 +14,7 @@ namespace DustSensorViewer
 {
     public partial class Form1 : Form
     {
-        private static readonly int CHART_AXIS_X_MAX = 300;
+        private static readonly int CHART_AXIS_X_MAX = 3600;    // sec
         public Form1()
         {
             InitializeComponent();
@@ -25,6 +25,12 @@ namespace DustSensorViewer
             chart1.ChartAreas[0].AxisX.Maximum = CHART_AXIS_X_MAX + 1;
             chart1.ChartAreas[0].AxisY.Minimum = 0;
             chart1.ChartAreas[0].AxisY.Maximum = Double.NaN;
+
+            checkBox_PMS_raw.Visible = false;
+
+            Filter_pm10 = new Filter.AverageFilter((int)numericUpDown1.Value);
+            Filter_pm25 = new Filter.AverageFilter((int)numericUpDown1.Value);
+            Filter_pm1 = new Filter.AverageFilter((int)numericUpDown1.Value);
         }
 
         private void update_comboBox()
@@ -56,14 +62,33 @@ namespace DustSensorViewer
             if(data.Count() > 0)
             {
                 if (data.Length == 10)
+                {
+                    if (checkBox_PMS_raw.Visible)
+                    {
+                        checkBox_PMS_raw.Invoke(new Action(delegate ()
+                        {
+                            checkBox_PMS_raw.Visible = false;
+                        }));
+                    }
                     parse_SDS(data);
+
+                }
                 else if (data.Length == 25)
                 {
                     //parse_PMS(data);
                     Console.WriteLine("PMS3003 is not supoorted now");
                 }
                 else if (data.Length == 32)
+                {
+                    if (!checkBox_PMS_raw.Visible)
+                    {
+                        checkBox_PMS_raw.Invoke(new Action(delegate ()
+                        {
+                            checkBox_PMS_raw.Visible = true;
+                        }));
+                    }
                     parse_PMS(data);
+                }
             }
         }
     
@@ -232,8 +257,8 @@ namespace DustSensorViewer
             }));
             thread_log.Start(); // thread 실행하여 병렬작업 시작
         }
-
-        private void update_chart<T>(T pm10, T pm25)
+        
+        private void update_chart(double pm10, double pm25)
         {
             if (!IsControlValid(chart1)) return;
 
@@ -243,14 +268,51 @@ namespace DustSensorViewer
                 {
                     chart1.Invoke(new Action(delegate ()
                     {
+                        string Avg_10 = "PM10 - Avg" + numericUpDown1.Value;
+                        string Avg_25 = "PM2.5 - Avg" + numericUpDown1.Value;
+
+                        if (checkBox_filter.Checked)
+                        {
+                            if (!chart1.Series.Contains(chart1.Series.FindByName(Avg_10)))
+                            {
+                                chart1.Series.Add(Avg_10);
+                                chart1.Series[Avg_10].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+                                chart1.Series.Add(Avg_25);
+                                chart1.Series[Avg_25].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+
+
+                                for (int i=0; i< chart1.Series["PM10"].Points.Count - 1; i++)
+                                {
+                                    chart1.Series[Avg_10].Points.AddY(Filter_pm10.insert(chart1.Series["PM10"].Points.ElementAt(i).YValues[0]));
+                                    chart1.Series[Avg_25].Points.AddY(Filter_pm25.insert(chart1.Series["PM2.5"].Points.ElementAt(i).YValues[0]));
+                                }
+                            }
+
+                            chart1.Series[Avg_10].Points.AddY(Filter_pm10.insert(pm10));
+                            chart1.Series[Avg_25].Points.AddY(Filter_pm25.insert(pm25));
+                        }
+                        else
+                        {
+                            if(chart1.Series.Contains(chart1.Series.FindByName(Avg_10)))
+                                chart1.Series.Remove(chart1.Series.FindByName(Avg_10));
+                            if (chart1.Series.Contains(chart1.Series.FindByName(Avg_25)))
+                                chart1.Series.Remove(chart1.Series.FindByName(Avg_25));                            
+                        }
+
                         if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
                             chart1.Series["PM10"].Points.RemoveAt(0);
                             chart1.Series["PM2.5"].Points.RemoveAt(0);
                             chart1.Series["PM1.0"].Points.RemoveAt(0);
 
+                            if (checkBox_filter.Checked)
+                            {
+                                chart1.Series[Avg_10].Points.RemoveAt(0);
+                                chart1.Series[Avg_25].Points.RemoveAt(0);
+                            }
                             chart1.ChartAreas[0].RecalculateAxesScale();
                         }
+
                         chart1.Series["PM10"].Points.AddY(pm10);
                         chart1.Series["PM2.5"].Points.AddY(pm25);
                         chart1.Series["PM1.0"].Points.AddY(0);
@@ -267,18 +329,62 @@ namespace DustSensorViewer
         private void update_chart<T>(T pm10, T pm25, T pm1)
         {
             if (!IsControlValid(chart1)) return;
-
+            
             Thread thread_chart = new Thread(new ThreadStart(delegate () // thread 생성
             {
                 if (chart1.InvokeRequired)
                 {
                     chart1.Invoke(new Action(delegate ()
                     {
+                        string Avg_10 = "PM10 - Avg" + numericUpDown1.Value;
+                        string Avg_25 = "PM2.5 - Avg" + numericUpDown1.Value;
+                        string Avg_1 = "PM1.0 - Avg" + numericUpDown1.Value;
+
+                        if (checkBox_filter.Checked)
+                        {
+                            if (!chart1.Series.Contains(chart1.Series.FindByName(Avg_10)))
+                            {
+                                chart1.Series.Add(Avg_10);
+                                chart1.Series[Avg_10].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+                                chart1.Series.Add(Avg_25);
+                                chart1.Series[Avg_25].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+                                chart1.Series.Add(Avg_1);
+                                chart1.Series[Avg_1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+
+
+                                for (int i = 0; i < chart1.Series["PM10"].Points.Count - 1; i++)
+                                {
+                                    chart1.Series[Avg_10].Points.AddY(Filter_pm10.insert(chart1.Series["PM10"].Points.ElementAt(i).YValues[0]));
+                                    chart1.Series[Avg_25].Points.AddY(Filter_pm25.insert(chart1.Series["PM2.5"].Points.ElementAt(i).YValues[0]));
+                                    chart1.Series[Avg_1].Points.AddY(Filter_pm1.insert(chart1.Series["PM1.0"].Points.ElementAt(i).YValues[0]));
+                                }
+                            }
+
+                            chart1.Series[Avg_10].Points.AddY(Filter_pm10.insert(Convert.ToDouble(pm10)));
+                            chart1.Series[Avg_25].Points.AddY(Filter_pm25.insert(Convert.ToDouble(pm25)));
+                            chart1.Series[Avg_1].Points.AddY(Filter_pm1.insert(Convert.ToDouble(pm1)));
+                        }
+                        else
+                        {
+                            if (chart1.Series.Contains(chart1.Series.FindByName(Avg_10)))
+                                chart1.Series.Remove(chart1.Series.FindByName(Avg_10));
+                            if (chart1.Series.Contains(chart1.Series.FindByName(Avg_25)))
+                                chart1.Series.Remove(chart1.Series.FindByName(Avg_25));
+                        }
+
                         if (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                         {
                             chart1.Series["PM10"].Points.RemoveAt(0);
                             chart1.Series["PM2.5"].Points.RemoveAt(0);
                             chart1.Series["PM1.0"].Points.RemoveAt(0);
+
+                            if (checkBox_filter.Checked)
+                            {
+                                chart1.Series[Avg_10].Points.RemoveAt(0);
+                                chart1.Series[Avg_25].Points.RemoveAt(0);
+                                chart1.Series[Avg_1].Points.RemoveAt(0);
+                            }
+
                             chart1.ChartAreas[0].RecalculateAxesScale();
                         }
                         chart1.Series["PM10"].Points.AddY(pm10);
@@ -356,7 +462,7 @@ namespace DustSensorViewer
             parse2array(CF_data,        3, 4);
             parse2array(Air_data,       3, 10);
             parse2array(raw_particle,   6, 16);            
-
+            
             Console.WriteLine("{0}, {1},version = {2}, bug = {3}", raw_input[2], raw_input[3], raw_input[28], raw_input[29]);
             
             if (raw_input[28] == 114)    // PMS-5003 or 1003
@@ -365,20 +471,55 @@ namespace DustSensorViewer
             {
                 update("PMS7003", Air_data[2], Air_data[1], Air_data[0]);
 
-                //string s_log = String.Format(LOG_LINE[1], DateTime.Now.ToString(TIME_FORMAT[0]), CF_data[2], CF_data[1], CF_data[0]);
-                //update_log("PMS7003_CF", s_log);
-                //s_log = String.Format(LOG_LINE[2], DateTime.Now.ToString(TIME_FORMAT[0]), raw_particle[0], raw_particle[1], raw_particle[2], raw_particle[3], raw_particle[4], raw_particle[5]);
-                //update_log("PMS7003_Raw", s_log);
+                if (checkBox_PMS_raw.Checked)
+                {
+                    string s_log = String.Format(LOG_LINE[1], DateTime.Now.ToString(TIME_FORMAT[0]), CF_data[2], CF_data[1], CF_data[0]);
+                    update_log("PMS7003_CF", s_log);
+                    s_log = String.Format(LOG_LINE[2], DateTime.Now.ToString(TIME_FORMAT[0]), raw_particle[0], raw_particle[1], raw_particle[2], raw_particle[3], raw_particle[4], raw_particle[5]);
+                    update_log("PMS7003_Raw", s_log);
+                }
             }
         }
         #endregion
-
+        
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             AbortThread = true;
 
             if (serialPort1.IsOpen)
                     serialPort1.Close();            
+        }
+
+        private DustSensorViewer.Filter.AverageFilter Filter_pm10;
+        private DustSensorViewer.Filter.AverageFilter Filter_pm25;
+        private DustSensorViewer.Filter.AverageFilter Filter_pm1;
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            chart1.Invoke(new Action(delegate ()
+            {
+                while (chart1.Series.Count > 3)
+                {
+                    chart1.Series.RemoveAt(chart1.Series.Count - 1);
+                }
+            }));
+
+            Filter_pm10 = new Filter.AverageFilter((int)numericUpDown1.Value);
+            Filter_pm25 = new Filter.AverageFilter((int)numericUpDown1.Value);
+            Filter_pm1 = new Filter.AverageFilter((int)numericUpDown1.Value);
+        }
+
+        private void checkBox_filter_CheckedChanged(object sender, EventArgs e)
+        {
+            if(!checkBox_filter.Checked)
+            {
+                chart1.Invoke(new Action(delegate ()
+                {
+                    while (chart1.Series.Count > 3)
+                    {
+                        chart1.Series.RemoveAt(chart1.Series.Count - 1);
+                    }
+                }));
+            }
         }
     }
 }

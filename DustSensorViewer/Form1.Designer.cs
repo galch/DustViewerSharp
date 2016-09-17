@@ -36,6 +36,9 @@
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.checkBox_filter = new System.Windows.Forms.CheckBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.checkBox_PMS_raw = new System.Windows.Forms.CheckBox();
             this.button_con = new System.Windows.Forms.Button();
             this.comboBox_port = new System.Windows.Forms.ComboBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -46,6 +49,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
@@ -65,6 +69,9 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.checkBox_filter);
+            this.splitContainer1.Panel1.Controls.Add(this.numericUpDown1);
+            this.splitContainer1.Panel1.Controls.Add(this.checkBox_PMS_raw);
             this.splitContainer1.Panel1.Controls.Add(this.button_con);
             this.splitContainer1.Panel1.Controls.Add(this.comboBox_port);
             // 
@@ -75,6 +82,52 @@
             this.splitContainer1.SplitterDistance = 38;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // checkBox_filter
+            // 
+            this.checkBox_filter.AutoSize = true;
+            this.checkBox_filter.ForeColor = System.Drawing.Color.Lime;
+            this.checkBox_filter.Location = new System.Drawing.Point(804, 20);
+            this.checkBox_filter.Name = "checkBox_filter";
+            this.checkBox_filter.Size = new System.Drawing.Size(269, 30);
+            this.checkBox_filter.TabIndex = 4;
+            this.checkBox_filter.Text = "Enable Moving Average";
+            this.checkBox_filter.UseVisualStyleBackColor = true;
+            this.checkBox_filter.CheckedChanged += new System.EventHandler(this.checkBox_filter_CheckedChanged);
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(671, 17);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 33);
+            this.numericUpDown1.TabIndex = 3;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // checkBox_PMS_raw
+            // 
+            this.checkBox_PMS_raw.AutoSize = true;
+            this.checkBox_PMS_raw.ForeColor = System.Drawing.Color.Lime;
+            this.checkBox_PMS_raw.Location = new System.Drawing.Point(414, 20);
+            this.checkBox_PMS_raw.Name = "checkBox_PMS_raw";
+            this.checkBox_PMS_raw.Size = new System.Drawing.Size(236, 30);
+            this.checkBox_PMS_raw.TabIndex = 2;
+            this.checkBox_PMS_raw.Text = "Save Raw Data(PMS)";
+            this.checkBox_PMS_raw.UseVisualStyleBackColor = true;
             // 
             // button_con
             // 
@@ -209,9 +262,11 @@
             this.Text = "Dust Viewer v1.2 by herz1012";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
@@ -231,6 +286,9 @@
         private System.Windows.Forms.TextBox textBox_console;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.CheckBox checkBox_PMS_raw;
+        private System.Windows.Forms.CheckBox checkBox_filter;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
     }
 }
 
