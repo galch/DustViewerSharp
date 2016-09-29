@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace DustSensorViewer
 {
     public partial class Form1 : Form
     {
-        private static readonly int CHART_AXIS_X_MAX = 600;    // sec
         public Form1()
         {
             InitializeComponent();
@@ -22,7 +22,7 @@ namespace DustSensorViewer
             update_comboBox();
             
             chart1.ChartAreas[0].AxisX.Minimum = 1;
-            chart1.ChartAreas[0].AxisX.Maximum = CHART_AXIS_X_MAX + 1;
+            chart1.ChartAreas[0].AxisX.Maximum = 600 + 1;
             chart1.ChartAreas[0].AxisY.Minimum = 0;
             chart1.ChartAreas[0].AxisY.Maximum = Double.NaN;
 
@@ -182,7 +182,7 @@ namespace DustSensorViewer
             {
                 if (File.Exists(log_path))
                 {
-                    List<string> last_logs = File.ReadLines(log_path).Reverse().Take(CHART_AXIS_X_MAX).Reverse().ToList();
+                    List<string> last_logs = File.ReadLines(log_path).Reverse().Take((int)chart1.ChartAreas[0].AxisX.Maximum).Reverse().ToList();
 
                     foreach (var log in last_logs)
                     {
@@ -263,7 +263,16 @@ namespace DustSensorViewer
             }));
             thread_log.Start(); // thread 실행하여 병렬작업 시작
         }
-        
+
+        private void cut_chart(DataPointCollection point_arr, int cut)
+        {
+            
+            var point_temp = point_arr.Skip(cut).ToArray();
+            point_arr.Clear();
+            //point_arr.Add(point_temp);
+
+            Console.WriteLine(point_arr.Count);
+        }
         private void update_chart(double pm10, double pm25)
         {
             if (!IsControlValid(chart1)) return;
@@ -304,20 +313,17 @@ namespace DustSensorViewer
                             if (chart1.Series.Contains(chart1.Series.FindByName(Avg_25)))
                                 chart1.Series.Remove(chart1.Series.FindByName(Avg_25));                            
                         }
-
-                        while (chart1.Series["PM10"].Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
+                        
+                        foreach (var series in chart1.Series)
                         {
-                            chart1.Series["PM10"].Points.RemoveAt(0);
-                            chart1.Series["PM2.5"].Points.RemoveAt(0);
-                            chart1.Series["PM1.0"].Points.RemoveAt(0);
-
-                            if (checkBox_filter.Checked)
+                            while (series.Points.Count > chart1.ChartAreas[0].AxisX.Maximum)
                             {
-                                chart1.Series[Avg_10].Points.RemoveAt(0);
-                                chart1.Series[Avg_25].Points.RemoveAt(0);
+                                series.Points.RemoveAt(0);
+                                //int leftover = series.Points.Count - (int)chart1.ChartAreas[0].AxisX.Maximum;
+                                //cut_chart(series.Points, leftover);
                             }
-                            chart1.ChartAreas[0].RecalculateAxesScale();
                         }
+                        chart1.ChartAreas[0].RecalculateAxesScale();
 
                         chart1.Series["PM10"].Points.AddY(pm10);
                         chart1.Series["PM2.5"].Points.AddY(pm25);
