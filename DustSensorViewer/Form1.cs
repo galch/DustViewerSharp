@@ -253,6 +253,9 @@ namespace DustSensorViewer
                 {
                     textBox_console.Invoke(new Action(delegate ()
                     {
+                        if (textBox_console.Lines.Count() > 120)
+                            textBox_console.Lines = textBox_console.Lines.Skip(1).ToArray();
+
                         textBox_console.AppendText(s + "\r\n");
                     }));
                 }

@@ -2,7 +2,7 @@
 Uart based dust sensor parsing and visualization program
 
 ## [CH340 USB-Serial Driver](http://www.arduined.eu/files/CH341SER.zip)
-## [Download binary(only for windows)](https://github.com/Galch/DustViewerSharp/raw/master/DustSensorViewer/bin/Debug/DustSensorViewer.exe)
+## [Download binary(only for windows)](https://github.com/Galch/DustViewerSharp/raw/master/DustSensorViewer/bin/Release/DustSensorViewer.exe)
 
 - env : C#, VS2015
 - font : [D2_Coding](http://dev.naver.com/projects/d2coding/download/11568?filename=D2Coding-Ver1.1-TTC-20151103.zip)
