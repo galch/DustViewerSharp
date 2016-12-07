@@ -52,16 +52,35 @@ namespace DustSensorViewer
         {
             update_comboBox();
         }
-
+        List<byte> data_acc = new List<byte>();
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             Console.WriteLine("Recv packet length {0}", serialPort1.BytesToRead);
             byte[] data = new byte[serialPort1.BytesToRead];
             serialPort1.Read(data, 0, serialPort1.BytesToRead);
+            data_acc.AddRange(data);
 
             if(data.Count() > 0)
             {
-                if (data.Length == 10)
+                if(data_acc.IndexOf(PMS_HEADER2) - data_acc.IndexOf(PMS_HEADER1) == 1)
+                {
+                    if(data_acc.Count > 32)
+                    {
+                        byte[] maybePMSpacket = data_acc.GetRange(data_acc.IndexOf(PMS_HEADER1), 32).ToArray();
+
+                        if (!checkBox_PMS_raw.Visible)
+                        {
+                            checkBox_PMS_raw.Invoke(new Action(delegate ()
+                            {
+                                checkBox_PMS_raw.Visible = true;
+                            }));
+                        }
+                        parse_PMS(maybePMSpacket);
+                        data_acc.RemoveRange(data_acc.IndexOf(PMS_HEADER1), 32);
+                    }
+
+                }
+                else if (data_acc.IndexOf(SDS_TAIL) - data_acc.IndexOf(SDS_HEADER1) == 10)
                 {
                     if (checkBox_PMS_raw.Visible)
                     {
@@ -71,24 +90,7 @@ namespace DustSensorViewer
                         }));
                     }
                     parse_SDS(data);
-
-                }
-                else if (data.Length == 25)
-                {
-                    //parse_PMS(data);
-                    Console.WriteLine("PMS3003 is not supoorted now");
-                }
-                else if (data.Length == 32)
-                {
-                    if (!checkBox_PMS_raw.Visible)
-                    {
-                        checkBox_PMS_raw.Invoke(new Action(delegate ()
-                        {
-                            checkBox_PMS_raw.Visible = true;
-                        }));
-                    }
-                    parse_PMS(data);
-                }
+                }                
             }
         }
     
@@ -161,6 +163,7 @@ namespace DustSensorViewer
             update_log(sensor_name, s_log);
             update_text(s_text);
             update_chart(pm10, pm25);
+            ThingSpeakClient.UpdateChannelFeed(pm10, pm25);
         }
 
         private void update(string sensor_name, int pm10, int pm25, int pm1)
@@ -171,6 +174,7 @@ namespace DustSensorViewer
             update_log(sensor_name, s_log);
             update_text(s_text);
             update_chart(pm10, pm25, pm1);
+            ThingSpeakClient.UpdateChannelFeed(pm10, pm25, pm1);
         }
 
         private void update_log(string sensor_name, string msg)
@@ -416,12 +420,14 @@ namespace DustSensorViewer
         }
 
 
-        const byte SDS_HEADER = 0xAA;
+        const byte SDS_HEADER1 = 0xAA;
+        const byte SDS_HEADER2 = 0xC0;
+        const byte SDS_TAIL = 0xAB;
         private void parse_SDS(byte[] raw_input)
         {
             // packet format: AA C0 PM25_Low PM25_High PM10_Low PM10_High 0 0 CRC AB
             if (raw_input.Count() != 10) return;
-            if (raw_input[0] != SDS_HEADER || raw_input[1] != 0xC0 || raw_input[9] != 0xAB) return;
+            if (raw_input[0] != SDS_HEADER1 || raw_input[1] != SDS_HEADER2 || raw_input[9] != SDS_TAIL) return;
 
             byte crc = 0;
             for(int i=0; i<6; i++)
@@ -439,13 +445,14 @@ namespace DustSensorViewer
             update("SDS021", pm10, pm25);
         }
 
-        const byte PMS_HEADER = 0x42;
+        const byte PMS_HEADER1 = 0x42;
+        const byte PMS_HEADER2 = 0x4D;
         private void parse_PMS(byte[] raw_input)
         {
             // datasheet : https://drive.google.com/file/d/0B6jowxS0fbXsQi1MSHR5UzFPa3c/view
             // packet format: 42 4D CF_1.0_High CF_1.0_Low ...
             if (raw_input.Count() != 32) return;
-            if (raw_input[0] != PMS_HEADER || raw_input[1] != 0x4D) return;
+            if (raw_input[0] != PMS_HEADER1 || raw_input[1] != PMS_HEADER2) return;
 
             Func<int, int> parse = (index) =>
             {
