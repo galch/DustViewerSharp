@@ -55,9 +55,11 @@ namespace DustSensorViewer
         List<byte> data_acc = new List<byte>();
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            Console.WriteLine("Recv packet length {0}", serialPort1.BytesToRead);
-            byte[] data = new byte[serialPort1.BytesToRead];
-            serialPort1.Read(data, 0, serialPort1.BytesToRead);
+            int recvedPacketLength = serialPort1.BytesToRead;
+            if (recvedPacketLength == 0) return;
+            Console.WriteLine("Recv packet length {0}", recvedPacketLength);
+            byte[] data = new byte[recvedPacketLength];
+            serialPort1.Read(data, 0, recvedPacketLength);
             data_acc.AddRange(data);
 
             if(data.Count() > 0)
