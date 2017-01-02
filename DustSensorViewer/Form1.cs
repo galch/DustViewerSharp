@@ -61,8 +61,9 @@ namespace DustSensorViewer
             byte[] data = new byte[recvedPacketLength];
             serialPort1.Read(data, 0, recvedPacketLength);
             data_acc.AddRange(data);
+            Console.WriteLine(BitConverter.ToString(data));
 
-            if(data.Count() > 0)
+            if (data.Count() > 0)
             {
                 if(data_acc.IndexOf(PMS_HEADER2) - data_acc.IndexOf(PMS_HEADER1) == 1)
                 {
@@ -80,9 +81,8 @@ namespace DustSensorViewer
                         parse_PMS(maybePMSpacket);
                         data_acc.RemoveRange(data_acc.IndexOf(PMS_HEADER1), 32);
                     }
-
                 }
-                else if (data_acc.IndexOf(SDS_TAIL) - data_acc.IndexOf(SDS_HEADER1) == 10)
+                else if (data_acc.IndexOf(SDS_TAIL) - data_acc.IndexOf(SDS_HEADER1) == 9)
                 {
                     if (checkBox_PMS_raw.Visible)
                     {
@@ -92,8 +92,10 @@ namespace DustSensorViewer
                         }));
                     }
                     parse_SDS(data);
+                    data_acc.RemoveRange(data_acc.IndexOf(SDS_HEADER1), 10);
                 }                
             }
+
         }
     
         private void button_con_Click(object sender, EventArgs e)
