@@ -12,6 +12,12 @@ namespace DustSensorViewer
     {
         public static async void UpdateChannelFeed(int pm10, int pm25, int pm1)
         {
+            if (File.Exists("apikey.txt") == false)
+            {
+                Console.WriteLine("No API Key File");
+                return;
+            }
+
             StreamReader sr = new StreamReader("apikey.txt", System.Text.Encoding.Default);
             string api_key = sr.ReadLine();
             if (api_key.Length != 16)
@@ -22,12 +28,12 @@ namespace DustSensorViewer
             using (var client = new HttpClient())
             {
                 var values = new Dictionary<string, string>
-            {
-                { "api_key", api_key },
-                { "field1", pm10.ToString() },
-                { "field2", pm25.ToString() },
-                { "field3", pm1.ToString() }
-            };
+                {
+                    { "api_key", api_key },
+                    { "field1", pm10.ToString() },
+                    { "field2", pm25.ToString() },
+                    { "field3", pm1.ToString() }
+                };
 
                 try
                 {
@@ -45,6 +51,12 @@ namespace DustSensorViewer
 
         public static async void UpdateChannelFeed(double pm10, double pm25)
         {
+            if (File.Exists("apikey.txt") == false)
+            {
+                Console.WriteLine("No API Key File");
+                return;
+            }
+
             StreamReader sr = new StreamReader("apikey.txt", System.Text.Encoding.Default);
             string api_key = sr.ReadLine();
             if(api_key.Length != 16)
