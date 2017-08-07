@@ -505,6 +505,18 @@ namespace DustSensorViewer
                     update_log("PMS7003_Raw", s_log);
                 }
             }
+            if (raw_input[28] == 145)    // PMS-A003
+            {
+                update("PMSA003", Air_data[2], Air_data[1], Air_data[0]);
+
+                if (checkBox_PMS_raw.Checked)
+                {
+                    string s_log = String.Format(LOG_LINE[1], DateTime.Now.ToString(TIME_FORMAT[0]), CF_data[2], CF_data[1], CF_data[0]);
+                    update_log("PMSA003_CF", s_log);
+                    s_log = String.Format(LOG_LINE[2], DateTime.Now.ToString(TIME_FORMAT[0]), raw_particle[0], raw_particle[1], raw_particle[2], raw_particle[3], raw_particle[4], raw_particle[5]);
+                    update_log("PMSA003_Raw", s_log);
+                }
+            }
         }
         #endregion
         
