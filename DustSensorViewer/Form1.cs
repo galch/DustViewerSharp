@@ -167,7 +167,6 @@ namespace DustSensorViewer
             update_log(sensor_name, s_log);
             update_text(s_text);
             update_chart(pm10, pm25);
-            ThingSpeakClient.UpdateChannelFeed(pm10, pm25);
         }
 
         private void update(string sensor_name, int pm10, int pm25, int pm1)
@@ -178,7 +177,6 @@ namespace DustSensorViewer
             update_log(sensor_name, s_log);
             update_text(s_text);
             update_chart(pm10, pm25, pm1);
-            ThingSpeakClient.UpdateChannelFeed(pm10, pm25, pm1);
         }
 
         private void update_log(string sensor_name, string msg)
