@@ -159,8 +159,32 @@ namespace DustSensorViewer
                                                        "{0}\tPM 10\t{1} µg/m3\tPM 2.5\t{2} µg/m3\tPM 1.0\t{3} µg/m3\tSensor: {4}"};
 
 
+        private static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
         private void update(string sensor_name, double pm10, double pm25)
         {
+            if (checkBox_sampling.Checked)
+            {
+                if (stopwatch.IsRunning)
+                {
+                    if((stopwatch.ElapsedMilliseconds / 1000) < (numericUpDown2.Value * 60))
+                    {
+                        return;
+                    }
+
+                    stopwatch.Reset();
+                }
+                else
+                {
+                    stopwatch.Start();
+                }
+            }
+            else
+            {
+                stopwatch.Reset();
+                stopwatch.Stop();
+            }
+
             string s_log = String.Format(LOG_LINE[0], DateTime.Now.ToString(TIME_FORMAT[0]), pm10.ToString("0.0"), pm25.ToString("0.0"));
             string s_text = String.Format(TEXT_LINE[0], DateTime.Now.ToString(TIME_FORMAT[1]), pm10.ToString("0.0"), pm25.ToString("0.0"), sensor_name);
 
@@ -171,6 +195,28 @@ namespace DustSensorViewer
 
         private void update(string sensor_name, int pm10, int pm25, int pm1)
         {
+            if (checkBox_sampling.Checked)
+            {
+                if (stopwatch.IsRunning)
+                {
+                    if ((stopwatch.ElapsedMilliseconds / 1000) < (numericUpDown2.Value * 60))
+                    {
+                        return;
+                    }
+
+                    stopwatch.Reset();
+                }
+                else
+                {
+                    stopwatch.Start();
+                }
+            }
+            else
+            {
+                stopwatch.Reset();
+                stopwatch.Stop();
+            }
+
             string s_log = String.Format(LOG_LINE[1], DateTime.Now.ToString(TIME_FORMAT[0]), pm10, pm25, pm1);
             string s_text = String.Format(TEXT_LINE[1], DateTime.Now.ToString(TIME_FORMAT[1]), pm10, pm25, pm1, sensor_name);
             
