@@ -1,7 +1,30 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DustSensorViewer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="filter" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="filtervalue" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="updown1" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="updown2" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="plot" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="sampling" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="showlog" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="showchart" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>
