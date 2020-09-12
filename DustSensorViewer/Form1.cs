@@ -52,24 +52,24 @@ namespace DustSensorViewer
         {
             update_comboBox();
         }
-        List<byte> data_acc = new List<byte>();
+        List<byte> chunkBytes = new List<byte>();
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             int recvedPacketLength = serialPort1.BytesToRead;
             if (recvedPacketLength == 0) return;
             Console.WriteLine("Recv packet length {0}", recvedPacketLength);
-            byte[] data = new byte[recvedPacketLength];
-            serialPort1.Read(data, 0, recvedPacketLength);
-            data_acc.AddRange(data);
-            Console.WriteLine(BitConverter.ToString(data));
+            byte[] rawInputBytes = new byte[recvedPacketLength];
+            serialPort1.Read(rawInputBytes, 0, recvedPacketLength);
+            chunkBytes.AddRange(rawInputBytes);
+            Console.WriteLine(BitConverter.ToString(rawInputBytes));
 
-            if (data.Count() > 0)
+            if (rawInputBytes.Count() > 0)
             {
-                if(data_acc.IndexOf(PMS_HEADER2) - data_acc.IndexOf(PMS_HEADER1) == 1)
+                if(chunkBytes.IndexOf(PMS_HEADER2) - chunkBytes.IndexOf(PMS_HEADER1) == 1)
                 {
-                    if(data_acc.Count > 32)
+                    if(chunkBytes.Count > (chunkBytes.IndexOf(PMS_HEADER1) + 32))
                     {
-                        byte[] maybePMSpacket = data_acc.GetRange(data_acc.IndexOf(PMS_HEADER1), 32).ToArray();
+                        byte[] maybePMSpacket = chunkBytes.GetRange(chunkBytes.IndexOf(PMS_HEADER1), 32).ToArray();
 
                         if (!checkBox_PMS_raw.Visible)
                         {
@@ -79,10 +79,10 @@ namespace DustSensorViewer
                             }));
                         }
                         parse_PMS(maybePMSpacket);
-                        data_acc.RemoveRange(data_acc.IndexOf(PMS_HEADER1), 32);
+                        chunkBytes.RemoveRange(chunkBytes.IndexOf(PMS_HEADER1), 32);
                     }
                 }
-                else if (data_acc.IndexOf(SDS_TAIL) - data_acc.IndexOf(SDS_HEADER1) == 9)
+                else if (chunkBytes.IndexOf(SDS_TAIL) - chunkBytes.IndexOf(SDS_HEADER1) == 9)
                 {
                     if (checkBox_PMS_raw.Visible)
                     {
@@ -91,9 +91,14 @@ namespace DustSensorViewer
                             checkBox_PMS_raw.Visible = false;
                         }));
                     }
-                    parse_SDS(data);
-                    data_acc.RemoveRange(data_acc.IndexOf(SDS_HEADER1), 10);
-                }                
+                    parse_SDS(rawInputBytes);
+                    chunkBytes.RemoveRange(chunkBytes.IndexOf(SDS_HEADER1), 10);
+                }
+                else if (chunkBytes.Count > 40)
+                {
+                    // If neither PMS nor SDS is found and the chunk length exceeds 40
+                    chunkBytes.Clear();
+                }
             }
 
         }
