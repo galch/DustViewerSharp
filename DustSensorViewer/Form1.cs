@@ -195,6 +195,16 @@ namespace DustSensorViewer
 
             update_log(sensor_name, s_log);
             update_text(s_text);
+            if (checkBox_filter.Checked)
+            {
+                update_label(label_pm10, Filter_pm10.CurrentAverage);
+                update_label(label_pm25, Filter_pm25.CurrentAverage);
+            }
+            else
+            {
+                update_label(label_pm10, pm10);
+                update_label(label_pm25, pm25);
+            }
             update_chart(pm10, pm25);
         }
 
@@ -227,6 +237,17 @@ namespace DustSensorViewer
             
             update_log(sensor_name, s_log);
             update_text(s_text);
+            if (checkBox_filter.Checked)
+            {
+                update_label(label_pm10, Filter_pm10.CurrentAverage);
+                update_label(label_pm25, Filter_pm25.CurrentAverage);
+            }
+            else
+            {
+                update_label(label_pm10, pm10);
+                update_label(label_pm25, pm25);
+            }
+
             update_chart(pm10, pm25, pm1);
         }
 
@@ -322,6 +343,27 @@ namespace DustSensorViewer
                 }
             }));
             thread_log.Start(); // thread 실행하여 병렬작업 시작
+        }
+
+        private void update_label(Label lab,double value)
+        {
+            if (!IsControlValid(lab)) return;
+
+            Thread thread_lab = new Thread(new ThreadStart(delegate () // thread 생성
+            {
+                if (lab.InvokeRequired)
+                {
+                    lab.Invoke(new Action(delegate ()
+                    {
+                        lab.Text = value.ToString("0.0");
+                    }));
+                }
+                else
+                {
+                    lab.Refresh();
+                }
+            }));
+            thread_lab.Start(); // thread 실행하여 병렬작업 시작
         }
 
         private void cut_chart(DataPointCollection point_arr, int cut)
@@ -571,6 +613,16 @@ namespace DustSensorViewer
         
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.filter= checkBox_filter.Checked;
+            Properties.Settings.Default.showlog = checkbox_showlog.Checked ;
+            Properties.Settings.Default.showchart = checkBox_showgraph.Checked;
+            Properties.Settings.Default.sampling = checkBox_sampling.Checked;
+            Properties.Settings.Default.filtervalue=numericUpDown1.Value;
+            Properties.Settings.Default.updown1 = numericUpDown1.Value;
+            Properties.Settings.Default.updown2 = numericUpDown2.Value;
+            Properties.Settings.Default.plot = numericUpDown_chartX.Value;
+            Properties.Settings.Default.Save();
+
             AbortThread = true;
 
             if (serialPort1.IsOpen)
@@ -616,6 +668,29 @@ namespace DustSensorViewer
                 chart1.ChartAreas[0].AxisX.Maximum = (int)numericUpDown_chartX.Value + 1;
                 chart1.Update();
             }));
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            checkBox_filter.Checked=Properties.Settings.Default.filter;
+            checkbox_showlog.Checked = Properties.Settings.Default.showlog;
+            checkBox_showgraph.Checked = Properties.Settings.Default.showchart;
+            checkBox_sampling.Checked = Properties.Settings.Default.sampling;
+            if (Properties.Settings.Default.filtervalue>numericUpDown1.Minimum) numericUpDown1.Value=Properties.Settings.Default.filtervalue;
+            if (Properties.Settings.Default.updown1 != 0)numericUpDown1.Value=Properties.Settings.Default.updown1;
+            if (Properties.Settings.Default.updown2 !=0) numericUpDown2.Value=Properties.Settings.Default.updown2;
+            if (Properties.Settings.Default.plot !=0) numericUpDown_chartX.Value=Properties.Settings.Default.plot;
+
+        }
+
+        private void checkbox_showlog_CheckedChanged(object sender, EventArgs e)
+        {
+            splitContainer2.Panel1Collapsed = !checkbox_showlog.Checked;
+        }
+
+        private void checkBox_showgraph_CheckedChanged(object sender, EventArgs e)
+        {
+            splitContainer2.Panel2Collapsed = !checkBox_showgraph.Checked;
         }
     }
 }
